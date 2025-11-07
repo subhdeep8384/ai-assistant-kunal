@@ -7,7 +7,7 @@ import { generateSummary } from '../controllers/aiController.js';
 const router = express.Router();
 
 // ✅ Generate AI summary
-router.post('/summary', protect, generateSummary);
+router.post('/summary', generateSummary);
 
 
 // router.post('/quiz', protect, generateQuiz);

@@ -1,19 +1,30 @@
 import File from "../models/File.js";
 import path from "path";
 import fs from "fs";
-import pdf from "pdf-parse-new"
+import pdf from "pdf-parse-new";
 
+
+const quietPdfParse = async (buffer) => {
+  const originalWarn = console.warn;
+  const originalLog = console.log;
+  console.warn = () => {};
+  console.log = () => {};
+  try {
+    return await pdf(buffer);
+  } finally {
+    console.warn = originalWarn;
+    console.log = originalLog;
+  }
+};
 export const uploadFile = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file uploaded" });
     }
-    const { originalname, filename, mimetype, size, path: filePath } = req.file;
 
-   
+    const { originalname, filename, mimetype, size, path: filePath } = req.file;
     const normalizedPath = path.resolve(filePath);
 
-   
     const file = await File.create({
       userId: req.user?._id || null,
       fileName: originalname,
@@ -23,7 +34,6 @@ export const uploadFile = async (req, res) => {
       uploadedAt: new Date(),
     });
 
-    
     res.status(201).json({
       success: true,
       message: "File uploaded successfully!",
@@ -32,9 +42,10 @@ export const uploadFile = async (req, res) => {
         name: originalname,
         type: mimetype,
         size,
-        url: `/uploads/${filename}`, 
+        url: `/uploads/${filename}`,
       },
     });
+
   } catch (error) {
     console.error("❌ File Upload Error:", error);
     res.status(500).json({
@@ -62,20 +73,19 @@ export const getFile = async (req, res) => {
     }
 
     const fileBuffer = fs.readFileSync(filePath);
-    const data = await pdf(fileBuffer);
+    const data = await quietPdfParse(fileBuffer);
 
-   
     let cleanText = data.text
-      .replace(/\n{2,}/g, "\n")       
-      .replace(/[ \t]{2,}/g, " ")      
-      .replace(/\s+$/, "")            
-      .trim();                        
+      .replace(/\n{2,}/g, "\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\s+$/, "")
+      .trim();
 
     res.json({
       success: true,
       fileName: file.fileName,
       fileType: file.fileType,
-      text: cleanText, 
+      text: cleanText.length > 1 ? cleanText : file,
     });
 
   } catch (error) {
@@ -87,5 +97,3 @@ export const getFile = async (req, res) => {
     });
   }
 };
-
-

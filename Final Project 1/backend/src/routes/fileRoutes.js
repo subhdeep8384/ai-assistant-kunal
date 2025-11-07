@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ✅ Upload a file (protected)
-router.post("/upload", protect, upload.single("file"), uploadFile);
+router.post("/upload", upload.single("file"), uploadFile);
 
 // ✅ Get a file by ID (protected)
 router.get("/:id", getFile);

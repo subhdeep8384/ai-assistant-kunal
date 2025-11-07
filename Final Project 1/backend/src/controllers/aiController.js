@@ -5,13 +5,10 @@ import { geminiModel } from "../utils/geminiClient.js";
 export const generateSummary = async (req, res) => {
   console.log("inside generate summary")
   try {
-    console.log("req is ",req.body.fileId)
-    const file = req.body.fileId;
-    console.log("file is sexxyyyyy :::::::::::::::::" ,file)
+    console.log(req)
+    const text = req.body;
+   
 
-    if (!text || text.trim() === "") {
-      return res.status(400).json({ success: false, message: "Text is required to generate summary." });
-    }
 
     // 🧠 Create a structured prompt for Gemini
     const prompt = `Summarize the following study material in simple, well-structured bullet points for students.
