@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 export default function Dashboard() {
+  const [summary , setSummary] = useState("")
   const { user, token } = useAuth(); 
   const [imagePrompt, setImagePrompt] = useState('');
   const [generatedImages, setGeneratedImages] = useState([]);
@@ -36,9 +37,7 @@ export default function Dashboard() {
   };
 
   const  handleGenerate = async (type, file) => {
-    console.log("type is :::::: ", type)
     if (!file) return;
-    console.log(file)
     setLoading(true);
     try {
       const formData = new FormData();
@@ -56,15 +55,19 @@ export default function Dashboard() {
     
 
       if (type === 'summary') {
-        alert("generating summary")
         const res = await axios.get(
           `http://localhost:4000/api/file/${fileId}`,
           { fileId },
           { headers: { Authorization: token } }
         );
-       
         const dataToGiveGemini = res.data.text; ;
-        
+       const summary = await axios.post(`http://localhost:4000/api/ai/summary`, {
+        headers: { Authorization: token },
+        fileId ,
+        data: dataToGiveGemini,
+       })
+       console.log(summary)
+       setSummary(summary.data.summary)
 
       } else if (type === 'quiz') {
         await axios.post(

@@ -1,16 +1,18 @@
 import Summary from '../models/Summary.js';
 
-// ✅ Get all summaries for logged-in user
 export const getSummaries = async (req, res) => {
   console.log("indide get summariues")
   try {
-    const summaries = await Summary.find({ userId: req.user._id }).sort({ createdAt: -1 });
-    console.log("summaries is ::::::::::" ,summaries)
+    const userId =  req.user._id
+ 
+    const summaries = await Summary.find({ userId: userId }).sort({ createdAt: -1 });
+    
     res.status(200).json({
       success: true,
       message: 'Summaries fetched successfully',
-      data: summaries,
+      data: summaries[0].summaryText,
     });
+    
   } catch (error) {
     console.error("❌ Fetch Summaries Error:", error);
     res.status(500).json({

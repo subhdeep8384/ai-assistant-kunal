@@ -1,5 +1,8 @@
 // src/controllers/geminiController.js
-import { geminiModel } from "../utils/geminiClient.js"; // use your geminiClient.js
+ // use your geminiClient.js
+
+import { GoogleGenAI } from "@google/genai";
+
 
 export const getGeminiResponse = async (req, res) => {
   const prompt = req.body.prompt;
@@ -10,13 +13,16 @@ export const getGeminiResponse = async (req, res) => {
 
   try {
     // Call Gemini AI
-    const result = await geminiModel.generateContent(prompt);
+    const geminiModel = new GoogleGenAI({
+      apiKey: "AIzaSyB80SpQVX4-kzTWS9obLovuCu5PrZQ9_yY",
+    })
+    const result = await geminiModel.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
     
     // Extract text
     const answer = result.response?.text() || "";
-
-    console.log("Prompt:", prompt);
-    console.log("Answer:", answer);
 
     res.status(200).json({ success: true, answer });
   } catch (error) {

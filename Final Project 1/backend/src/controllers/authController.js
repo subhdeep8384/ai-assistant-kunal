@@ -49,7 +49,7 @@ export const register = async (req, res) => {
 
 // ✅ Login Controller
 export const login = async (req, res) => {
-  console.log("Inside login")
+
   try {
     const { email, password } = req.body;
     console.log(email , password)
